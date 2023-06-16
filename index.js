@@ -1,4 +1,5 @@
-function greet(person, date) {
-    console.log("Hello ".concat(person, ", today is ").concat(date.toDateString(), "!"));
+"use strict";
+const arr = [1, 2, 3];
+for (let i in arr) {
+    console.log(i);
 }
-greet("Maddison", new Date());
