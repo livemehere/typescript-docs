@@ -210,3 +210,171 @@ const f1: voidFunc = () => {
 
 console.log(f1()) // void
 ```
+
+## Object Types
+
+[type and interface 치트시트](https://www.typescriptlang.org/cheatsheets)
+
+
+### 타입스크립트는 서로 다른 타입이 호환이 되는지를 체크한다
+
+아래는 서로 다른 타입이지만, 호환이 된다.
+
+```ts
+interface Person {
+  name: string;
+  age: number;
+}
+
+interface ReadonlyPerson {
+  readonly name: string;
+  readonly age: number;
+}
+
+let writablePerson: Person = {
+  name: "Person McPersonface",
+  age: 42,
+};
+
+// works
+let readonlyPerson: ReadonlyPerson = writablePerson;
+```
+
+### Index Signatures
+
+정확한 값은 모르지만, 그 형태를 알때 사용한다.
+
+```ts
+interface StringArray {
+  [index: number]: string;
+}
+
+const myArray: StringArray = ["Bob", "Fred"];
+
+const myStr: string = myArray[0];
+```
+
+인덱스 시그니처의 키 값은 js 런타임 시점에 모두 문자열로 변환된다.
+
+```ts
+interface Animal {
+  name: string;
+}
+
+interface Dog extends Animal {
+  breed: string;
+}
+
+interface NotOkay {
+  [x: number]: Animal|Dog; // 1.ok
+}
+
+interface NotOkay {
+    [x: string]: Animal|Dog; // 2.ok
+}
+```
+
+인덱스 시그니처는 모든 property 가 반환 유형과 일치하도록 강제한다.
+
+```ts
+interface NumberDictionary {
+  [index: string]: number; // 이미 모든 타입을 넘버로 선언해버렸기 때문에,
+  length: number; // ok, 이녀석은 특정한 프로퍼티를 명시한것 이되고
+  name: string; // no , 이건 안된다.
+}
+
+// 하지만 유니온 타입으로 해주면 됨
+interface NumberOrStringDictionary {
+    [index: string]: number | string;
+    length: number; // ok, length is a number
+    name: string; // ok, name is a string
+}
+```
+
+### Excess Property Checks
+
+- 인터페이스에 정의되지 않은 프로퍼티를 가지고 있으면 에러가 난다.
+- 하지만 중요한 점 중 하나는, 객체에 없는 프로퍼티에 접근하면 에러가 나는것이 당연한데, 한번 변수에 할당해서 사용하면 에러가 나지 않는 점에 유의해야한다.
+
+```ts
+interface SquareConfig {
+  color?: string;
+  width?: number;
+}
+
+function createSquare(config: SquareConfig): { color: string; area: number } {
+  return {
+    color: config.color || "red",
+    area: config.width ? config.width * config.width : 20,
+  };
+}
+// ---cut---
+let squareOptions = { colour: "red", width: 100 };
+let squareOptions2 = { colour: "red" };
+let mySquare = createSquare(squareOptions); // ok
+mySquare = createSquare({ colour: "red", width: 100 }); // 에러
+mySquare = createSquare(squareOptions2); // 에러 (이건 최소한의 조건도 맞지 않기 때문에 발생)
+```
+
+## 타입 확장
+
+- interface 는 확장이 가능하고, 대상으로 하는 확장 은 interface, type, class 모두 가능하다.
+
+```ts
+type BasicAddress = {
+  name?: string;
+  street: string;
+  city: string;
+  country: string;
+  postalCode: string;
+}
+
+class P {
+  price:number;
+  constructor(price:number){
+    this.price = price;
+  }
+}
+
+interface AddressWithUnit extends P { // P 자리에는 클래스, 인터페이스, 타입 모두 가능하다.
+  unit: string;
+}
+
+function getObj(obj:AddressWithUnit){
+  obj.price
+}
+```
+
+## Array , ReadonlyArray
+
+- ReadonlyArray 는 읽기 전용 배열이다. push, pop, splice 등의 메소드를 사용할 수 없다.
+- `Array<string>` = `string[]`
+- `ReadonlyArray<string>` = `readonly string[]`
+- 다른 객체의 readonly 속성끼리 호환이 되는 반면, Array 와 ReadonlyArray 는 호환이 되지 않는다.
+
+```ts
+let x: readonly string[] = [];
+let y: string[] = [];
+ 
+x = y;
+y = x;
+```
+
+## Tuple
+
+- rest parameter 의 순서가 자유롭다
+
+```ts
+type StringNumberBooleans = [string, number, ...boolean[]];
+type StringBooleansNumber = [string, ...boolean[], number];
+type BooleansStringNumber = [...boolean[], string, number];
+```
+
+- 네이밍을 자유롭게 할 수 있다
+
+```ts
+function readButtonInput(...args: [string, number, ...boolean[]]) {
+  const [name, version, ...input] = args;
+  // ...
+}
+```
