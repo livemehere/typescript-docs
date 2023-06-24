@@ -378,3 +378,355 @@ function readButtonInput(...args: [string, number, ...boolean[]]) {
   // ...
 }
 ```
+
+## Generics
+
+- <>를 생략하면 추론한다.
+- 제네릭으로 interface, type, class 를 만들 수 있다. (열거형, 네임스페이스는 x)
+
+### 다양한 형태의 동일한 제네릭
+
+```ts
+// 제네릭을 호출 시그니처 에만 사용
+interface GenericIdentityFn {
+    <Type>(arg: Type): Type;
+}
+
+function identity<Type>(arg: Type): Type {
+  return arg;
+}
+let myIdentity: GenericIdentityFn = identity;
+
+// or 
+// 인터페이스 자체에 제네릭 선언
+interface GenericIdentityFn<Type> {
+    (arg: Type): Type;
+}
+let myIdentity2: GenericIdentityFn<number> = identity;
+```
+
+### class 제네릭
+
+- static 에서는 제네릭을 사용할 수 없다.
+
+```ts
+class GenericNumber<Type> {
+  static totalValue: Type; // error
+  zeroValue: Type; //ok
+  add: (x: Type, y: Type) => Type; // ok
+}
+```
+
+- 제네릭에서 클래스 타입 표현하기
+
+```ts
+class Bee extends Animal {
+  keeper: BeeKeeper;
+}
+ 
+class Lion extends Animal {
+  keeper: ZooKeeper;
+}
+
+function create<Type extends Animal>(c: {new ():Type}): Type {
+  return new c();
+}
+
+create(Lion).keeper.nametag; // 타입검사!
+create(Bee).keeper.hasMask;  // 타입검사!
+```
+
+### 변수 정의와 제약
+
+- 작성하다보면 <> 바깥쪽에서 타입을 지정할때 extends 를 사용하는 경우가 종종있는데, 이는 안된다. 아래 예시처럼 제네릭에대한 제약을 걸때는 <> 안에서 해결하자.
+- 
+```ts
+function identify<T,K extends keyof T>(obj:T,key:K):T[K]{
+  return obj[key];
+}
+```
+
+## typeof
+
+```ts
+// 함수의 리턴타입 가져오기
+type A = (x:number)=> boolean;
+type K = ReturnType<A>;
+
+// 값은 타입이 될 수 없음으로, typeof 를 사용해서 리턴타입 가져오기
+function f(){
+  return {x:3, y:3}
+}
+type FK = ReturnType<typeof f>;
+
+```
+
+## Indexed Access Types 
+
+> 값은 타입이 될 수 없음에 유의하고, 사용하기 위해서는 `typeof` 를 사용해야한다.  
+> 인덱싱에 사용할 수 있는 값으로, const 로 선언된 변수 또한 안된다. as const 해도 안된다. 반드시 타입만 가능!
+
+```ts
+const MyArray = [
+  { name: "Alice", age: 15 },
+  { name: "Bob", age: 23 },
+  { name: "Eve", age: 38 },
+];
+ 
+// 값은 타입이 될 수 없으니, 값에서 타입을 추출하려면 typeof 사용!!!
+ type P = typeof MyArray[number];
+
+// 똑같음
+ type A = P['age'];
+ type RA = typeof MyArray[number]['age']
+```
+
+## Conditional Types
+
+- extends 를 사용해서 타입에 삼항 연산자를 사용할 수 있다
+
+```ts
+type IsString<T> = T extends string ? true : false;
+type A = IsString<string>; // true
+type B = IsString<number>; // false
+```
+
+### 조건부 타입으로 타입 제한하기
+
+```ts
+type MessageOf<T extends {message:unknown}> = T["message"];
+
+const obj = {
+    name:'kong',
+    message:1
+}
+
+type M = MessageOf<typeof obj>;
+```
+
+### never 활용해서 타입에러 제거하기
+
+```ts
+ 
+type MessageOf<T extends {message:unknown}> = T["message"];
+
+const obj = {
+    name:'kong',
+}
+
+type M = MessageOf<typeof obj>; // message가 없는 타입이 들어와서 에러남
+```
+
+```ts
+// 없는 경우도 분기처리를 해놨기 때문에 에러 발생안하고 never 로 추론됨
+type MessageOf<T> = T extends {message:unknown} ? T["message"] : never;
+
+const obj = {
+    name:'kong',
+}
+
+type M = MessageOf<typeof obj>;
+```
+
+### infer
+
+- infer 를 사용해서 타입을 생성할 수 있다. (마치 변수 생성)
+
+```ts
+type Flat<T> = T extends Array<infer I> ? I : T;
+type A = Flat<string>
+```
+
+### 제네릭의 분산법칙
+
+```ts
+type ToArray<Type> = Type extends any ? Type[] : never;
+type StrArrOrNumArr = ToArray<string | number>; // string[] | number[] 이렇게 분산되는데 이것을 막고자한다면
+
+type ToArrayNonDist<Type> = [Type] extends any ? Type[] : never; // 이렇게 [] 로 한번씩 감싸주면된다.
+```
+
+## Mappped Types
+
+- 기존 타입을 변환해서 새로운 타입을 만들어낸다.(중복되는 타입을 줄일 수 있다)
+- 보통 인덱스 시그니처 타입을 사용한다.
+
+```ts
+type OptionsFlags<Type> = {
+    [Property in keyof Type]: boolean;
+};
+
+type FeatureFlags = {
+    darkMode: () => void;
+    newUserProfile: () => void;
+};
+
+type FeatureOptions = OptionsFlags<FeatureFlags>; // {darkMode:boolean, newUserProfile:boolean}
+```
+
+### Mapping Modifiers
+
+- readonly, ? 등의 타입을 변환할 수 있다.
+
+```ts
+type ReamoveReadonly<Type> = {
+    -readonly [Property in keyof Type]: boolean;
+};
+
+type ReamoveOptional<Type> = {
+    [Property in keyof Type]-?: boolean;
+};
+
+type FeatureFlags = {
+    readonly darkMode?: () => void;
+    readonly newUserProfile?: () => void;
+};
+
+type FeatureOptions = ReamoveReadonly<FeatureFlags> // {darkMode?:boolean, newUserProfile?:boolean}
+
+type FeatureOptions2 = ReamoveOptional<FeatureFlags> // {darkMode:()=>void, newUserProfile:()=>void}
+```
+
+### never 로 키 필터링 하기
+
+> type Exclude<T, U> = T extends U ? never : T;
+
+```ts
+type RemoveKindField<T> = {
+    [P in keyof T as Exclude<P,'kind'>]:T[P];
+}
+
+interface Circle {
+    kind: "circle";
+    radius: number;
+}
+ 
+type WithoutKind = RemoveKindField<Circle>; // {radius:number}
+```
+
+### 더 복잡한 예시
+
+```ts
+type EventConfig<T extends {kind:string}> = {
+    [P in T as P['kind']]: (event:P)=> void;
+}
+
+type SquareEvent = { kind: "square", x: number, y: number };
+type CircleEvent = { kind: "circle", radius: number };
+
+type Config = EventConfig<SquareEvent | CircleEvent> // {square:(event:SquareEvent)=>void, circle:(event:CircleEvent)=>void}
+```
+
+```ts
+type ExtractPII<T> ={
+    [P in keyof T]:T[P] extends {pii:true} ? true : false; // 이런식으로도 가능하다.
+}
+
+type DBFields = {
+  id: { format: "incrementing" };
+  name: { type: string; pii: true };
+};
+ 
+type ObjectsNeedingGDPRDeletion = ExtractPII<DBFields>;
+```
+
+
+### Key Remapping via as
+
+- as 를 사용해서 키를 바꿀 수 있다.
+
+```ts
+type MakeGetter<Type> = {
+    [Property in keyof Type as `get${string & Property}`]: boolean;
+};
+
+type FeatureFlags = {
+    darkMode: () => void;
+    newUserProfile: () => void;
+};
+
+type FeatureOptions = MakeGetter<FeatureFlags> // {getdarkMode:boolean, getnewUserProfile:boolean}
+```
+
+## Template Literal Types
+
+- 보간법으로 동적으로 타입을 생성할 수 있다.
+- 아래의 예시처럼 여러 경우의 수를 만들어낼 수 있다.
+
+```ts
+
+type Kong = 'Kong' | 'Ha'
+type wold = `hello ${Kong}`; // hello Kong | hello Ha
+
+
+type EmailLocaleIDs = "welcome_email" | "email_heading";
+type FooterLocaleIDs = "footer_title" | "footer_sendoff";
+type All = `${EmailLocaleIDs | FooterLocaleIDs}_ME` // welcome_email_ME | email_heading_ME | footer_title_ME | footer_sendoff_ME
+```
+
+- 또다른 예시
+
+```ts
+type WatchProps<T> = {
+    on(event:`${string & keyof T}Changed`,cb:(newValue:any)=>void): void;
+}
+
+declare function makeWatchedObject<T extends object>(obj:T):T & WatchProps<T>
+
+const person = makeWatchedObject({
+    name:'kong',
+    age:24,
+})
+
+person.on('nameChanged',(v)=>{
+ console.log(v);  
+})
+```
+
+### 인덱스 시그니처를 사용해서 타입을 제한할 수 있다. 
+
+```ts
+interface WatchProps<T> {
+    on<K extends string & keyof T>(event:`${K}Changed`,cb:(newValue:T[K])=>void): void;
+}
+
+declare function makeWatchedObject<T extends object>(obj:T):T & WatchProps<T>
+
+const person = makeWatchedObject({
+    name:'kong',
+    age:24,
+})
+
+person.on('nameChanged',(v)=>{ // v:string
+ console.log(v);  
+})
+
+
+person.on('ageChanged',(v)=>{ // v:number
+ console.log(v);  
+})
+```
+
+### String 타입 조작 
+
+```ts
+// 대문자1
+type Hello = 'hello';
+type UpHello = Uppercase<Hello> // HELLO
+
+// 대문자2
+type IdKey<K extends string> = `ID-${Uppercase<K>}`;
+type MainID = IdKey<'main'>; // ID-MAIN
+
+// 소문자
+type IdKeyLow<K extends string> = `ID-${Lowercase<K>}`;
+type MainLowID = IdKeyLow<'MAIN'>; // ID-main
+
+// 캐멀케이스
+type Str = 'hello,world';
+type CamelStr = Capitalize<Str>; // Hello,world
+
+// 캐멀케이스 반대
+type Str2 = 'HELLO,WOLRD';
+type Str2UnCap = Uncapitalize<Str2>; // hELLO,WOLRD
+```

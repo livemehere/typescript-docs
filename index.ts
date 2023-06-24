@@ -1,13 +1,10 @@
-type Person = {
-    name:string;
-    new (name:string): {name:string};
+type RemoveKindField<T> = {
+    [P in keyof T as Exclude<P,'kind'>]:T[P];
 }
 
-
-function print(fn:Person){
-    const p = new fn('kong');
-    console.log(p.name);
+interface Circle {
+    kind: "circle";
+    radius: number;
 }
 
-
-[].forEach()
+type WithoutKind = RemoveKindField<Circle>
