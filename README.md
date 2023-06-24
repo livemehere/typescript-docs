@@ -730,3 +730,327 @@ type CamelStr = Capitalize<Str>; // Hello,world
 type Str2 = 'HELLO,WOLRD';
 type Str2UnCap = Uncapitalize<Str2>; // hELLO,WOLRD
 ```
+
+## Class
+
+### --strictPropertyInitialization
+
+- 클래스의 프로퍼티를 초기화하지 않으면 에러가 발생한다.
+- 반드시 생성자 내에서만 초기화해야하고, 내부 메서드를 통해서 초기화는 인정되지 않는다.
+- 하지만 ! 로 할당을 어설션할 수 있다.
+
+```ts
+class A {
+    name: string; // 에러
+}
+
+// ---
+
+class B {
+    name: string; // ok
+    constructor() {
+        this.name = 'kong';
+    }
+}
+```
+
+### getter, setter
+
+- getter 를 선언하고, setter 를 선언하지 않으면 readonly 가 된다.
+- setter 의 매개변수의 타입을 지정하지 않으면, getter 의 반환 타입이 setter 의 매개변수 타입으로 추론한다.
+
+### property 도 인덱스 시그니처를 사용할 수 있다.
+
+```ts
+class MyClass {
+    [key:string]:any;
+
+    constructor(){
+        this.name = 'kong';
+    }
+}
+```
+
+### implements 가 구현을 해주진 않음을 주의해야한다.
+
+```ts
+interface A {
+  x: number;
+  y?: number;
+}
+class C implements A {
+  x = 0;
+  // y 속성을 선언하지 않았음으로
+}
+const c = new C();
+c.y = 10; // error 
+```
+
+### extends 는 구현을 해주지만, 생성자가 있을 경우 super() 를 호출해야한다.
+
+- 부모 클래스에 생성자가 선언되있지 않다면, 자식에서도 super() 를 호출하지 않아도 된다.
+
+```ts
+class Animal {
+  move() {
+    console.log("Moving along!");
+  }
+}
+ 
+class Dog extends Animal {
+  woof(times: number) {
+    for (let i = 0; i < times; i++) {
+      console.log("woof!");
+    }
+  }
+}
+ 
+const d = new Dog();
+d.move();
+d.woof(3);
+```
+
+### 메서드 오버라이딩
+
+- 메서드 오버라이딩을 할 때, 부모의 메서드를 호출하고 싶다면 super 를 사용한다.
+- 또한 오버라이딩은, 매개변수의 갯수,타입을 맞춰야한다.
+
+```ts
+class Base {
+  greet() {
+    console.log("Hello, world!");
+  }
+}
+ 
+class Derived extends Base {
+  greet(name?: string) {
+    if (name === undefined) {
+      super.greet();
+    } else {
+      console.log(`Hello, ${name.toUpperCase()}`);
+    }
+  }
+}
+ 
+const d = new Derived();
+d.greet();
+d.greet("reader");
+```
+
+```ts
+// @errors: 2416
+class Base {
+  greet() {
+    console.log("Hello, world!");
+  }
+}
+
+class Derived extends Base {
+  // Make this parameter required
+  greet(name: string) { // 에러 name 이 없을수도있어야함.
+    console.log(`Hello, ${name.toUpperCase()}`);
+  }
+}
+```
+
+### Type-only Field Declarations
+
+아래의 예시와 같은 상황이 있다.
+
+```ts
+interface Animal {
+  dateOfBirth: any;
+}
+ 
+interface Dog extends Animal {
+  breed: any;
+}
+
+class AnimalHouse {
+    resident:Animal;
+    constructor(animal:Animal){
+        this.resident = animal;
+    }
+}
+
+class DogHouse extends AnimalHouse {
+    constructor(dog:Dog){
+        super(dog);
+    }
+}
+```
+
+위와 같은 상태에서 엄현히 Dog 타입을 입력받았지만, AnimalHouse 에서 resident 는 Animal 이기 때문에 Dog 의 breed 를 사용할 수 없다.  
+그렇지만 field 를 재선언할 수 는 없기 때문에, 타입만 조정해 줄 수 있다.
+
+```ts
+class DogHouse extends AnimalHouse {
+    declare resident:Dog; // 이렇게 하면 타입만 재선언 된다.
+    constructor(dog:Dog){
+        super(dog);
+    }
+}
+```
+
+### static 멤버
+
+- static 멤버도 private, protected, public 을 사용할 수 있다.
+- static 맴버도 상속이된다.
+
+```ts
+class Base {
+  static getGreeting() {
+    return "Hello world";
+  }
+}
+class Derived extends Base {
+  myGreeting = Derived.getGreeting();
+}
+```
+
+- static 멤버는 제네릭 타입을 사용할 수 없다.
+
+```ts
+class MyClass<T> {
+  static x: T; // error, static 멤버는 제네릭 타입을 사용할 수 없다.
+}
+```
+
+### this 컨텍스트를 잃지 않는 메서드 선언방법 
+
+```ts
+class MyClass {
+  name = "MyClass";
+  getName() {
+    return this.name;
+  }
+}
+const c = new MyClass();
+const obj = {
+  name: "obj",
+  getName: c.getName,
+};
+ 
+// Prints "obj", not "MyClass"
+console.log(obj.getName());
+```
+
+아래처럼 arrow function 으로 선언하면 this 컨텍스트를 잃지 않는다.
+
+```ts
+class MyClass {
+  name = "MyClass";
+  getName = () => {
+    return this.name;
+  };
+}
+const c = new MyClass();
+const g = c.getName;
+// Prints "MyClass" instead of crashing
+console.log(g());
+```
+
+### class 표현식
+
+클래스도 익명 클래스 표현식이 있다.
+
+```ts
+const KongClass = class<T> {
+    content:T;
+    constructor(value:T){
+        this.content = value;
+    }
+}
+
+const kong = new KongClass('HI');
+```
+
+### this 를 활용한 타입 가드
+
+```ts
+class FileSystemObj {
+    
+    constructor(public path:string){}
+    isFile():this is FileRep{
+        return this instanceof FileRep;
+    }
+
+    isDirectory():this is Directory{
+        return this instanceof Directory;
+    }
+}
+
+
+class FileRep extends FileSystemObj {
+    constructor(path:string, public content:string){
+        super(path);
+    }
+}
+
+class Directory extends FileSystemObj {
+    constructor(path:string, public children:FileSystemObj[]){
+        super(path);
+    }
+}
+
+function print(obj:FileSystemObj){
+    if(obj.isFile()){
+        console.log(obj.content);
+    }else if (obj.isDirectory()){
+        console.log(obj.children)
+    }
+}
+```
+
+### 추상 클래스 
+
+```ts
+abstract class Base {
+  abstract getName(): string;
+ 
+  abstract printName():void;
+}
+ 
+class Derived extends Base {
+  getName() {
+    return "world";
+  }
+  printName(){
+    console.log(this.getName());
+  }
+}
+ 
+const d = new Derived();
+d.printName();
+console.log(d.getName())
+```
+
+### 클래스 자체를 인자로 받기
+
+```ts
+function greet(ctor: new () => Base) {
+  const instance = new ctor();
+  instance.printName();
+}
+greet(Derived);
+greet(Base); // error 추상 클래스는 안된다. 에초에 new 연산으로 생성이 불가능하니까.
+```
+
+### 클래스간 관계
+
+- 타입스크립트 클래스는 다른 유형과 마찬가지로 구조적으로 비교된다.
+
+```ts
+class Point1 {
+  x = 0;
+  y = 0;
+}
+ 
+class Point2 {
+  x = 0;
+  y = 0;
+}
+ 
+// OK
+const p: Point1 = new Point2();
+```
