@@ -1054,3 +1054,24 @@ class Point2 {
 // OK
 const p: Point1 = new Point2();
 ```
+
+### Cross-instance private access
+
+- 다른 OOP 언어에서는 private 멤버는 어떤 방식으로든 외부에서 접근이 불가능한데, Typescript 에서는 private 멤버는 같은 클래스의 다른 인스턴스에서 접근이 가능하다.
+
+```ts
+class A {
+  private x = 10;
+ 
+  public sameAs(other: A) {
+    // No error
+    return other.x === this.x;
+  }
+}
+```
+
+## Modules
+
+- javascript 모듈 시스템은 ES6 모듈 시스템으로 거의 굳혀지고있다.
+- 타입스크립트는 ES6 모듈 시스템을 지원한다.
+- import, export 가 없는 파일은 global scope 로 취급된다.
