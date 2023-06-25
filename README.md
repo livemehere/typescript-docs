@@ -1075,3 +1075,119 @@ class A {
 - javascript 모듈 시스템은 ES6 모듈 시스템으로 거의 굳혀지고있다.
 - 타입스크립트는 ES6 모듈 시스템을 지원한다.
 - import, export 가 없는 파일은 global scope 로 취급된다.
+- ES Modules interop ??!
+
+
+### 타입스크립트가 모듈을 처리하는 주요 3가지
+
+1. Syntax : 어떤 문법을 사용할 것인가?
+2. Module Resolution : 파일시스템에서 모듈을 찾는 방법
+3. Module Output Target : Javascript 로 컴파일 될 모듈의 형태
+
+### type import
+
+- babel, swc, esbuild 등과 같은 typescript 컴파일러가 아닌 다른 컴파일러들이 typescript 를 안전하게 제거할 수 있도록 명시할 수 있다.
+
+### ES Module + CommonJS Behavior
+
+```ts
+import fs = require("fs"); // 이렇게도 된다.
+```
+
+## DOM Manipulation
+
+### children vs childNodes
+
+- children 은 Element 만 반환한다.
+- childNodes 는 Element, Text, Comment, ProcessingInstruction, CDATASection, EntityReference 를 반환한다.
+
+```js
+<div>
+  <p>Hello, World</p>
+  <p>TypeScript!</p>
+</div>
+
+const div = document.getElementByTagName("div")[0];
+div.children;
+// HTMLCollection(2) [p, p]
+div.childNodes;
+// NodeList(2) [p, p]
+```
+
+## Babel vs tsc
+
+- 프레임워크가 설정해준다면 그것을 따라가라.
+- 결과물이 비슷하다면 tsc 사용하라
+- 빌드내 파이프라인이 필요하다면 babel 을 사용하고, 타입검사만 tsc 로 하라
+
+> 결론은 트랜스파일링은 babel, 타입검사는 tsc.
+
+- 바벨의 단점은 트랜스파일링 중 타입검사를 할 수 없다는 점인데, 에디터에서 잡지 못한 오류가 프로덕션 코드에포함될 수 있다. 그래서 타입체킹을 tsc 로 해주는 것이다.
+
+## Javascript 에서 Typescript 사용하는 방법
+
+### JSDoc
+
+- 경고정도만 하고, 컴파일에 영향 x
+
+```ts
+/** @type {number} */
+var x;
+x = 0; // 성공
+x = false; // 성공?!
+```
+
+### @ts-check
+
+- 컴파일 할 때 타입체킹을 한다.
+
+```js
+// @ts-check
+// @errors: 2322
+/** @type {number} */
+var x;
+x = 0; // 성공
+x = false; // 성공 아님
+```
+
+## tsconfig.json
+
+- `tsc` 는 `tsconfig.json` 을 참조한다.
+
+```json
+{
+  "compilerOptions": {
+    "outDir": "./dist",
+    "target": "ES2022",
+    "allowJs": true,
+    "module": "ES6", // 컴파일된 결과물의 모듈 시스템
+    "noFallthroughCasesInSwitch": true, // switch 문에서 break 누락시 에러
+    "noImplicitReturns": true, // 반환 타입 명시하도록 강제
+    "allowUnreachableCode": true, // 접근 불가 코드 허용
+    "noImplicitAny":true,
+    "noEmitOnError": true, // 컴파일 에러 발생 시 결과물 생성 X
+    "moduleResolution": "Node", // 모듈 해석 방식
+    "declaration": true, // 결과물로 .d.ts 파일 포함
+    "emitDeclarationOnly": true // 결과물로 .d.ts 파일만 생성
+  },
+  "include": ["./src/**/*"]
+}
+```
+
+## any, Object, {}
+
+- 이들은 만능 타입으로 사용되곤 한다.
+- 셋중에 사용해야할 일이 생긴다면 우선순위는 `any` > `{}` > `Object` 를 사용해라.
+
+## @ts-ignore, @ts-expect-error
+
+- 타입 에러를 무시하는 주석이다.
+
+## 타입 패키지를 만들 때는 package.json 도 수정이 필요하다.
+
+```json
+{
+  "main": "dist/index.d.ts",
+  "types": "dist/index.d.ts"
+}
+```
