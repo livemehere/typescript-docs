@@ -1187,8 +1187,8 @@ x = false; // 성공 아님
 
 ```json
 {
-  "main": "dist/magic-string-time.d.ts",
-  "types": "dist/magic-string-time.d.ts"
+  "main": "dist/global.d.ts",
+  "types": "dist/global.d.ts"
 }
 ```
 
@@ -1270,3 +1270,35 @@ declare global {
     }
 }
 ```
+
+## NPM 배포
+
+- `--declaration` 플래그를 사용하여 `.d.ts` 파일을 생성한다.
+- `package.json` 에 `types` 필드를 추가한다. (생략해도 상관없음)
+
+```json
+{
+    "name": "awesome",
+    "author": "Vandelay Industries",
+    "version": "1.0.0",
+    "main": "./lib/main.js",
+    "types": "./lib/main.d.ts" // or typings
+}
+```
+
+- types 패키지를 배포할때는, @types/[모듈] 패키지도 함께 배포해야한다.
+- `peerDependencies` 혹은 `dependencies` 에 추가한다. (devDependencies 는 사용자가 직접 설치해야되서 안됨)🚨 타입 패키지 한정임 주의!
+
+```json
+{
+    "name": "awesome",
+    "author": "Vandelay Industries",
+    "version": "1.0.0",
+    "main": "./lib/main.js",
+    "types": "./lib/main.d.ts",
+    "peerDependencies": {
+        "@types/node": "^14.14.37"
+    }
+}
+```
+

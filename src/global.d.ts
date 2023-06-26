@@ -1,3 +1,4 @@
+export {}
 declare global {
     interface String {
         startsWithHello(): boolean;
@@ -7,4 +8,3 @@ declare global {
     }
 }
 
-export {}

@@ -1,4 +1,4 @@
-export class API {
+declare class API {
     constructor(baseURL: string);
     getInfo(opts: API.InfoRequest): API.InfoResponse;
 }
@@ -11,8 +11,4 @@ declare namespace API {
         width: number;
         height: number;
     }
-
-    function add(a:number):number;
-    const a:number;
 }
-
