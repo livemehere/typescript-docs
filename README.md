@@ -1187,7 +1187,86 @@ x = false; // 성공 아님
 
 ```json
 {
-  "main": "dist/index.d.ts",
-  "types": "dist/index.d.ts"
+  "main": "dist/magic-string-time.d.ts",
+  "types": "dist/magic-string-time.d.ts"
+}
+```
+
+## Declaration Files
+
+- 어떤 라이브러리를 가져왔을 때, 선언 타입이 없다면, declare 키워드로 선언해주어 활용 하는 경우.
+- `isolatedModules` 옵션을 사용하면, 타입스크립트는 모듈을 단독으로 컴파일하고, 전역 스코프에 선언된 타입들은 무시한다.
+  - 하지만 `.d.ts` 파일은 전역 스코프로 인식한다(?)
+
+### d.ts 파일
+
+- `import`, `export` 구문이 포함되어있지 않으면 전역 스코프로 인식한다.
+  - 만약 모듈로 인식하게 하고싶다면 `export` 나 `import` 구문을 추가해주면된다.
+- 구현부는 포함할 수 없으며, 타입만 선언할 수 있는 파일이다.
+- 컴파일 할 떄 옵션으로 `--declaration` 을 주면 `.d.ts` 파일을 생성해주기 때문에 직접 작성하지 않아도된다.
+  - 하지만 나는 주로 타입을 d.ts 에 작성하고 import 해서 사용함으로써, 명시적으로 타입을 분리해둔다.
+
+```ts
+/* 전역 변수 선언 */
+declare var Kakao:any;
+
+/* 전역 함수 선언 */
+declare function sum(a:number,b:number):number;
+
+/* 전역 클래스 선언 */
+declare class Person {
+    name:string;
+    constructor(name:string);
+}
+
+/* 전역 인터페이스 선언 */
+interface Person2 {
+    name:string;
+    age:number;
+}
+
+/* 네임스페이스 선언 */
+declare namespace KongLib {
+    const name:string;
+    const age:number;
+    function hello():void;
+}
+
+/* 모듈 선언 */
+declare module KongMath {
+    function add(a:number,b:number):number;
+    function subtract(a:number,b:number):number;
+}
+```
+
+### `declare namespace` vs `declare module`
+
+??
+
+### default exports 주의사항
+
+- `export default` 를 .d.ts 에서 사용하려면 `esModuleInterop` 옵션을 true 로 설정해야한다.
+  - 만약 이옵션을 true 로하지 않고서(할수없는상황) 이라면 `export default` 를 사용하지말고, `export =` 를 사용하면된다.
+
+```ts
+declare function getArrayLength(arr: any[]): number;
+declare namespace getArrayLength {
+  declare const maxInterval: 12;
+}
+export = getArrayLength;
+```
+
+### 전역 스코프 타입 수정하기
+
+- `declare global` 을 사용하면 전역 스코프에 타입을 추가할 수 있다.
+
+```ts
+declare global {
+    interface String {
+        startsWithHello(): boolean;
+    }
+    interface Array<T> {
+        reverseAndSort(): T[];
+    }
 }
 ```
