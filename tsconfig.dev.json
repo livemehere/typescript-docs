@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "./dist",
+    "outDir": "./build",
     "target": "ES2022",
     "allowJs": true,
     "module": "CommonJS", // 컴파일된 결과물의 모듈 시스템
@@ -8,20 +8,12 @@
     "noImplicitReturns": true, // 반환 타입 명시하도록 강제
     "allowUnreachableCode": true, // 접근 불가 코드 허용
     "noImplicitAny":true,
-    "noEmitOnError": false, // 컴파일 에러 발생 시 결과물 생성 X
+    "noEmitOnError": true, // 컴파일 에러 발생 시 결과물 생성 X
     "moduleResolution": "Node", // 모듈 해석 방식
-    "declarationMap": false,
+    "declaration": true, // 결과물로 .d.ts 파일 포함
     "emitDeclarationOnly": false, // 결과물로 .d.ts 파일만 생성
     "isolatedModules": true,
-    "extendedDiagnostics": true,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "inlineSourceMap": true,
-    "jsx": "react-jsx",
-    "useDefineForClassFields": true,
-    "lib": ["ES2015","DOM"],
-    "typeRoots": ["./node_modules/@types"],
+    "typeRoots": ["./src"]
   },
   "include": ["./src/**/*"],
   "exclude": ["node_modules"]

@@ -6,10 +6,11 @@
   "types": "dist/index.d.ts",
   "devDependencies": {
     "@types/node": "^20.3.1",
-    "typescript": "4"
+    "typescript": "4.7"
   },
   "dependencies": {
     "@types/lodash": "^4.14.195",
+    "@types/react": "^18.2.14",
     "@types/three": "^0.152.1",
     "lodash": "^4.17.21",
     "three": "^0.153.0"
