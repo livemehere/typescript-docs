@@ -10,7 +10,7 @@
     "noImplicitAny":true,
     "noEmitOnError": false, // 컴파일 에러 발생 시 결과물 생성 X
     "moduleResolution": "Node", // 모듈 해석 방식
-    "declarationMap": false,
+    "declaration": false,
     "emitDeclarationOnly": false, // 결과물로 .d.ts 파일만 생성
     "isolatedModules": true,
     "extendedDiagnostics": true,
@@ -20,8 +20,7 @@
     "inlineSourceMap": true,
     "jsx": "react-jsx",
     "useDefineForClassFields": true,
-    "lib": ["ES2015","DOM"],
-    "typeRoots": ["./node_modules/@types"],
+    "lib": ["ES2015","DOM"]
   },
   "include": ["./src/**/*"],
   "exclude": ["node_modules"]

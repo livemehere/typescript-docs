@@ -1314,3 +1314,7 @@ declare global {
 - `--baseUrl` 절대경로의 기준이 되는 디렉토리를 지정한다.
 - `inlineSources` 이속성은 버그가있는지, 컴파일 결과가 안나온다. `inlineSourceMap` 이거쓰면된다.
 - tsc -b (build 모드) 는 noEmitOnError 를 강제로 true 로 설정한다.
+
+### with bundler
+
+- webpack, babel 의 경우에는 tsconfig.json 을 자동 참조한다. (다른것도 그럴듯..?)
