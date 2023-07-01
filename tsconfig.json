@@ -1,28 +1,36 @@
 {
+  "extends": "./tsconfig.common.json",
   "compilerOptions": {
-    "outDir": "./dist",
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noUncheckedIndexedAccess": false,
+    "strictBindCallApply": true,
+    "strictFunctionTypes": true,
+    "strictNullChecks": true,
+    "useUnknownInCatchVariables": true,
+    "allowUmdGlobalAccess": true,
+    "baseUrl": "./",
+    "paths": {
+      "@src/*": ["src/*"]
+    },
     "target": "ES2022",
-    "allowJs": true,
-    "module": "CommonJS", // 컴파일된 결과물의 모듈 시스템
-    "noFallthroughCasesInSwitch": true, // switch 문에서 break 누락시 에러
-    "noImplicitReturns": true, // 반환 타입 명시하도록 강제
-    "allowUnreachableCode": true, // 접근 불가 코드 허용
-    "noImplicitAny":true,
-    "noEmitOnError": false, // 컴파일 에러 발생 시 결과물 생성 X
-    "moduleResolution": "Node", // 모듈 해석 방식
-    "declaration": false,
-    "emitDeclarationOnly": false, // 결과물로 .d.ts 파일만 생성
-    "isolatedModules": true,
-    "extendedDiagnostics": true,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "inlineSourceMap": true,
-    "jsx": "react-jsx",
-    "useDefineForClassFields": true,
-    "lib": ["ES2015","DOM"]
-  },
-  "include": ["./src/**/*"],
-  "exclude": ["node_modules"]
-}
+    "moduleResolution": "Node",
+    "module": "ESNext",
+    "outDir": "dist",
+    "rootDir": "src",
+    "typeRoots": ["node_modules/@types"],
+    "declaration": true,
+    "importsNotUsedAsValues": "error",
+    "preserveValueImports": true,
+    "removeComments": true,
+    "sourceMap": true,
+    "stripInternal": true,
+    "charset": "utf8",
+    "suppressExcessPropertyErrors": true,
+    "watchFile": "useFsEvents"
 
+  },
+  "typeAcquisition": {
+
+  }
+}

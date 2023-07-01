@@ -1318,3 +1318,63 @@ declare global {
 ### with bundler
 
 - webpack, babel 의 경우에는 tsconfig.json 을 자동 참조한다. (다른것도 그럴듯..?)
+
+## tsconfig.json 
+
+### Files
+
+- 컴파일 할 파일을 지정한다. (glob 패턴 사용가능)
+
+### Extends
+
+- 다른 tsconfig 파일을 상속받을 수 있다. (자신의 파일의 속성이 우선순위가 높다. overwrite)
+
+### Include
+
+- Include 는 files 가 명시되어있으면, [] 이고, 명시되어있지 않으면, ["**/*"] 이다.
+- glob 패턴을 사용할 수 있다.
+  - `*` : 0개 이상의 문자
+  - `?` : 1개의 문자
+  - `**/` : 하위 디렉토리
+  - 만약 확장자가 정해지지 않으면, 지원하는 확장자만 포함된다. 기본적으로 ts, tsx, js, jsx 만 지원한다.(allowJs 를 했을 경우)
+
+### Exclude
+
+- glob 패턴을 사용할 수 있다.
+- 기본 값은 `node_modules` `bower_components` `jspm_packages` `outDir` 이다.
+
+### Compiler Options
+
+```
+allowUnreachableCode : 절대로 실행되지 않는 코드를 허용한다.
+exactOptionalPropertyTypes : optional property 를 주지만, 명시적으로 undefined 를 할당하면 에러를 발생시킨다.
+noFallthroughCasesInSwitch : switch 문에서 break 를 하지 않으면 에러를 발생시킨다.
+noImplicitOverride : class 에서 override 를 명시하지 않으면 에러를 발생시킨다. ex) `override` download() {...}
+noImplicitReturns : 함수에서 return 을 명시하지 않으면 에러를 발생시킨다.
+noImplicitThis : this 를 명시하지 않으면 에러를 발생시킨다.(통상 this 는 호출시점에 정해져서, 명시적으로 this 를 사용하는 경우가 드물다.)
+noPropertyAccessFromIndexSignature : 없는 프로퍼티를 'dot notation' 으로 접근하면 에러를 발생시킨다. index signature 를 사용하면 해결할 수 있다. ex) person.name (x) -> person['name'] (o)
+noUncheckedIndexedAccess : index signature 를 사용할때 undefined 를 추가해준다.
+strictBindCallApply : bind, call, apply 를 사용할때 파라미터 타입을 체크한다.(원레는 자유)
+strictFunctionTypes : 함수의 파라미터 타입을 체크한다. 하지만 method 의 경우는 체크하지 않는다.
+useUnknownInCatchVariables : catch 에서 unknown 을 사용할 수 없다.
+allowUmdGlobalAccess : 전역 객체 접근을 허용한다. (jQuery, lodash 등등 런타임에서 사실은 접근이 가능한 녀석들)
+baseUrl : 절대경로의 기준이 되는 디렉토리를 지정한다. (path 와 연계해서 사용하는 것이 node_modules 과 같은 라이브러리를 사용할때 편리하다.)
+paths : baseUrl 을 사용할때, alias 를 지정할 수 있다. (반드시 번들러와 함꼐 사용해야한다. tsc 는 해석을 할 수 있도록 map 을 작성해줄 뿐 resolve 하지 않는다)
+moduleResolution : 모듈을 해석하는 방식을 지정한다. (node, classic * classic 사용할 일은 현대에 없다.)
+rootDir : 컴파일 할 파일의 기준이 되는 디렉토리를 지정한다. ( . or src 르 사용하곤 하는데, 파일 구조가 달라지니 필요에 따라 설정)
+typeRoots : 타입 파일의 기준이 되는 디렉토리를 지정한다. (node_modules/@types 를 사용할때, 다른 디렉토리를 지정할 수 있다.)
+declarationDir : d.ts 파일의 기준이 되는 디렉토리를 지정한다. (outDir 과 같은 디렉토리를 지정할 수 있다.) ex) "dist/typings"
+declarationMap : 정의로 이동 할 경우 원본파일로 참조할 수 있도록 d.ts 파일에 맵을 생성한다.
+noEmit : 컴파일 결과를 생성하지 않는다. 번들러와 함께 사용할 때 유용하다.(번들러에게 컴파일을 맡긴다.)
+preserveConstEnums : const enum 을 보존한다. (enum 을 사용할때, const enum 을 사용하면, enum 을 사용한 모든 곳에 상수로 치환된다.)
+stripInternal : jsdoc 의 @internal 을 d.ts 로 추출하지 않는다.
+
+allowSyntheticDefaultImports : default export 가 없는 모듈에 한해서 default import 를 허용한다. ex) import * as _ from 'lodash' -> import _ from 'lodash'
+esModuleInterop : commonjs 모듈을 es6 모듈로 import 할 수 있도록 한다. (import _ from 'lodash' -> import _ from 'lodash-es') 위와 호환되는 옵션임
+forceConsistentCasingInFileNames : 파일명의 대소문자를 강제한다. (window 에서는 대소문자를 구분하지 않지만, linux 에서는 구분한다.)
+isolatedModules : 파일을 모듈로 취급한다. (import, export 를 사용하지 않으면 에러를 발생시킨다.) * 그렇지 않으면 번들러가 해석할 때 문제가 발생할 수 있다.
+experimentalDecorators : decorator 를 사용할 수 있도록 한다. (ex) @Component)
+
+
+
+```
