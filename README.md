@@ -1374,7 +1374,35 @@ esModuleInterop : commonjs 모듈을 es6 모듈로 import 할 수 있도록 한�
 forceConsistentCasingInFileNames : 파일명의 대소문자를 강제한다. (window 에서는 대소문자를 구분하지 않지만, linux 에서는 구분한다.)
 isolatedModules : 파일을 모듈로 취급한다. (import, export 를 사용하지 않으면 에러를 발생시킨다.) * 그렇지 않으면 번들러가 해석할 때 문제가 발생할 수 있다.
 experimentalDecorators : decorator 를 사용할 수 있도록 한다. (ex) @Component)
-
-
-
 ```
+
+## References
+
+### Utility Types
+
+- `Parameters<T>` : 함수의 파라미터 타입을 추출한다.
+- `ConstructorParameters<T>` : 클래스의 생성자 파라미터 타입을 추출한다.
+
+```ts
+declare function f1(arg: { a: number; b: string }): void;
+type T = Parameters<typeof f1>; // [arg: { a: number; b: string }]
+
+const a:T = [
+  {
+    a:1,
+    b:'2'
+  }
+]
+
+f1(...a);
+
+
+class Person  {
+  constructor(name:string, age:number){
+
+  }
+}
+
+type T0 = ConstructorParameters<typeof Person>; // [string, number]
+```
+
