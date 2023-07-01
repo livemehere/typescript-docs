@@ -1406,3 +1406,122 @@ class Person  {
 type T0 = ConstructorParameters<typeof Person>; // [string, number]
 ```
 
+### Declaration Merging
+
+- interface, type, class 를 합칠 수 있다.
+- interface 는 합칠 수 있지만, type 은 합칠 수 없다.
+- interface 는 같은 이름의 interface 를 합칠 수 있다.
+- interface 는 같은 이름의 class 를 합칠 수 있다.
+- class 는 같은 이름의 class 를 합칠 수 없다.
+- class 는 같은 이름의 interface 를 합칠 수 없다.
+- class 는 같은 이름의 type 을 합칠 수 없다.
+
+```ts
+interface Box {
+  x: number;
+  y: number;
+}
+
+interface Box {
+  width: number;
+  height: number;
+}
+
+const box:Box = {
+  x:0,
+  y:0,
+  width:100,
+  height:100
+}
+```
+
+#### 합성퇸 타입의 순서는 역순이다.
+
+```ts
+interface Document {
+  createElement(tagName: any): Element;
+}
+interface Document {
+  createElement(tagName: "div"): HTMLDivElement;
+  createElement(tagName: "span"): HTMLSpanElement;
+}
+interface Document {
+  createElement(tagName: string): HTMLElement;
+  createElement(tagName: "canvas"): HTMLCanvasElement;
+}
+
+// TO..
+
+interface Document {
+  createElement(tagName: "canvas"): HTMLCanvasElement;
+  createElement(tagName: "div"): HTMLDivElement;
+  createElement(tagName: "span"): HTMLSpanElement;
+  createElement(tagName: string): HTMLElement;
+  createElement(tagName: any): Element;
+}
+```
+
+#### namespace 는 내부의 애서 export 를 해야 병합 가능하고, 외부에서 접근 가능하다.
+
+```ts
+namespace Animals {
+  export let haveMuscles = true;
+  export class Zebra {}
+  export class Dog {}
+}
+
+namespace Animals {
+  export class Cat {}
+  export function hey(){
+    return haveMuscles;
+  }
+}
+
+```
+
+#### 외부 모듈 타입 커스텀 혹은 생성 (`declare module`)
+
+> 모듈을 보강하는 행위는 기존 선언에 대한 패치만 가능하고, 새로운 최상위의 선언을 할 수 없다.  
+> export 만 보강하가능하며, default exports 는 보강할 수 없다.
+
+```ts
+import {Observable} from "./obserable";
+
+declare module "./obserable" {
+    interface Observable<T>{
+        map<U>(f:(x:T)=> U):Observable<U>
+    }
+}
+
+Observable.prototype.map = function (f) {
+    let result = [];
+    for (let item of this.value){
+        result.push(f(item));
+    }
+    return new Observable(result);
+}
+
+let o = new Observable<number>([1,2,3]);
+o.map(x => x.toFixed(2));
+```
+
+- `declare module` 을 사용하여 외부 모듈의 타입을 커스텀 할 수 있다.
+- 파일의 경로를 작성하면된다. node_modules 에 있을 경우에는 패키지 명만 적어으면된다.
+
+
+####  전역 객체 커스텀하기 (`declare global`)
+
+```ts
+// observable.ts
+export class Observable<T> {
+  // ... 연습을 위해 남겨둠 ...
+}
+declare global {
+  interface Array<T> {
+    toObservable(): Observable<T>;
+  }
+}
+Array.prototype.toObservable = function () {
+  // ...
+};
+```

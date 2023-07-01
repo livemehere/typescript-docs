@@ -1,36 +1,11 @@
 {
   "extends": "./tsconfig.common.json",
   "compilerOptions": {
-    "noImplicitOverride": true,
-    "noImplicitReturns": true,
-    "noUncheckedIndexedAccess": false,
-    "strictBindCallApply": true,
-    "strictFunctionTypes": true,
-    "strictNullChecks": true,
-    "useUnknownInCatchVariables": true,
-    "allowUmdGlobalAccess": true,
-    "baseUrl": "./",
-    "paths": {
-      "@src/*": ["src/*"]
-    },
     "target": "ES2022",
     "moduleResolution": "Node",
-    "module": "ESNext",
+    "module": "CommonJS",
     "outDir": "dist",
     "rootDir": "src",
-    "typeRoots": ["node_modules/@types"],
-    "declaration": true,
-    "importsNotUsedAsValues": "error",
-    "preserveValueImports": true,
-    "removeComments": true,
-    "sourceMap": true,
-    "stripInternal": true,
-    "charset": "utf8",
-    "suppressExcessPropertyErrors": true,
-    "watchFile": "useFsEvents"
-
-  },
-  "typeAcquisition": {
-
+    "experimentalDecorators": true
   }
 }
