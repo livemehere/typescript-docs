@@ -1525,3 +1525,29 @@ Array.prototype.toObservable = function () {
   // ...
 };
 ```
+
+## Enum
+
+- 초기화 하지 않으면 0 부터 시작한다.
+- NaN, Infinity, -Infinity 는 enum 에서 사용할 수 없다.
+
+### 역 매핑도 가능하다
+
+```ts
+enum UserResponse {
+    No = 0,
+    Yes = 1,
+}
+
+const a = UserResponse.Yes; // 1
+const res = UserResponse[a]; // "Yes"
+```
+
+- const enum 은 enum 을 사용한 모든 곳에 상수로 치환된다. (빌드과정에서 제거되고, 상수로 모두 치환됨)
+
+```ts
+const enum UserResponse {
+    No = 0,
+    Yes = 1,
+}
+```

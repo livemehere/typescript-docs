@@ -1,15 +1,6 @@
-declare global {
-    interface Array<T> {
-        makeKong(): T[];
-    }
+const enum UserResponse {
+    No = 0,
+    Yes = 1,
 }
 
-Array.prototype.makeKong = function () {
-    return ['kong'];
-}
-
-const a:any[] = [];
-
-console.log(a.makeKong())
-
-export {}
+const a = UserResponse.Yes; // 1
