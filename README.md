@@ -1587,3 +1587,57 @@ export default ()=>{
   )
 }
 ```
+
+### ECMAScript Modules in Node.js
+
+- package.json 에서 type 을 module 로 설정하면, 상대 경로를 사용할 때 반드시 확장자를 적어야한다. 그렇지 않으면 에러발생
+
+```ts
+import {sum} from "./obserable"; // error
+
+console.log(sum());
+```
+
+```ts
+import {sum} from "./obserable.js"; // ok
+
+console.log(sum());
+```
+
+> 그래서 결국 브라우저에서 돌아갈 수 있도록 결과물이 나온것이고, 보통은 webpack 같은 번들러를 사용한다.(하나하나 모든 모듈을 import 하진 않고싶으니..?)
+
+#### package.json 레퍼런스 커스텀
+
+- 가장 기본적으로는 main, types 를 참조한다.
+- 하지만 exports 가 정의되어있다면, 모듈 시스템에 맞는 경로를 참조한다.
+- 주의할 점은 types 가 동일하더라도 각각 작성해주어야한다. 공통된다고 하나로 사용할 수 없다.
+
+```json
+// package.json
+{
+    "name": "my-package",
+    "type": "module",
+    "exports": {
+        ".": {
+            // Entry-point for `import "my-package"` in ESM
+            "import": {
+                // Where TypeScript will look.
+                "types": "./types/esm/index.d.ts",
+                // Where Node.js will look.
+                "default": "./esm/index.js"
+            },
+            // Entry-point for `require("my-package")` in CJS
+            "require": {
+                // Where TypeScript will look.
+                "types": "./types/commonjs/index.d.cts",
+                // Where Node.js will look.
+                "default": "./commonjs/index.cjs"
+            },
+        }
+    },
+    // Fall-back for older versions of TypeScript
+    "types": "./types/index.d.ts",
+    // CJS fall-back for older versions of Node.js
+    "main": "./commonjs/index.cjs"
+}
+```

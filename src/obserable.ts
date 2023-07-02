@@ -1,6 +1,3 @@
-export class Observable<T>{
-    constructor(
-        public value: T[]
-    ) {
-    }
+export function sum() {
+  return 1 + 1;
 }
