@@ -5,10 +5,10 @@
     "moduleResolution": "Node",
     "module": "CommonJS",
     "outDir": "dist",
-    "rootDir": "src",
     "jsx": "react-jsx",
     "esModuleInterop": true,
     "isolatedModules": true,
-    "declaration": true
+    "declaration": true,
+    "rootDirs": ["src", "template/views"],
   }
 }

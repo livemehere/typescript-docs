@@ -1722,3 +1722,59 @@ const map = new Kakao.Map();
 export function isPrime(x:number):boolean;
 export as namespace mathLib; // 이렇게 하면 window. 객체에 추가된다. node 라면 global 객체에 추가된다. 즉 전역으로 추가된다. 또한 import, require 도 가능하다
 ```
+
+### Module Resolution
+
+- Classic, Node 중 하나의 전략을 선택한다.
+  - 절대 경로라면 Ambient 모듈을 찾는다. (ex) `declare module "url" {...}`
+- (Node) 현재 경로에서 한 뎁스씩 빠져 나가면서 node_modules/ 에서 찾는다.
+- d.ts 파일은 node_modules/@types 를 먼저 찾고, 패키지 내부에 있는 d.ts 파일을 찾는다.
+  - 하지만 package.json 에서 types 를 지정했다면 그것을 먼저 체크한다.
+
+#### baseURL
+
+- 상대경로가 cli 로 주어진다면 현재 경로를 기준으로 계산
+- 상대경로가 tsconfig 에 선언된다면 tsconfig.json 의 위치를 기준으로 계산
+
+#### paths
+
+- 아래와 같이 배열로 path 를 매핑할 수 있는데, 찾지못하면 순서대로 다음 path 를 사용하여 찾는다.
+
+```json
+ "paths": {
+      "*": [
+        "*",
+        "generated/*"
+      ]
+    }
+```
+
+### Namespace and Modules
+
+- ambient 타입은 선언은 반드시 모듈이 아니어야한다.
+  - 모듈이 아니려면 선언파일이 어야한다. (.d.ts 그리고 declare 키워드를 사용) -> .d.ts 파일에서 declare 사용)
+
+### Triple-Slash Directives
+
+- `/// <reference path="..." />` 를 사용하여 파일간의 의존성을 선언할 수 있다.
+  - 하지만 이제는 import 를 사용하자.
+
+```ts
+/// <reference types="node" /> 는 @types/node/index.d.ts 를 참조한다.
+```
+
+### Type Compatibility
+
+- 서로간의 호환성 여부를 판단하는 규칙
+  - 더 큰 범주에는 작은 것을 할당할 수 있고, 더 작은 범주에는 더 큰 것을 할당할 수 없다.
+
+```ts
+let items = [1, 2, 3];
+
+// 추가 매개변수를 강제로 사용하지 마세요.
+items.forEach((item, index, array) => console.log(item)); // 원래는 3개지만
+
+// 괜찮습니다!
+items.forEach(item => console.log(item)); // 1개로 작은것을 할 당할 수 있다. 하지만 그 반대는 안되는것 아시죠?
+```
+
