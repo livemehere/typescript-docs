@@ -1571,7 +1571,7 @@ const foo = <foo extends {}>bar; // ok
 #### 커스텀 태그 타입 추가하는 방법
 
 ```ts
-// custom.d.ts
+// custom.ts
 declare namespace JSX {
     interface IntrinsicElements {
         kong:any;
@@ -1640,4 +1640,85 @@ console.log(sum());
     // CJS fall-back for older versions of Node.js
     "main": "./commonjs/index.cjs"
 }
+```
+
+### Modules
+
+- 모든 파일은 모듈로서 동작하여 import ,export 를 해야 서로간 공유가 가능하다.
+  - 단 .d.ts 파일에 정의된 타입은 모듈로 만들지 않는다면 전역 참조가 된다.
+- class, 함수는 직접 export default 를 할 수 있지만, 변수는 export default 를 선언과 분리해야한다.(아니면 값을 바로 할당해야한다.)
+
+```ts
+declare let $: JQuery;
+export default $;
+
+// or 
+
+export default "123";
+```
+
+#### export default 와 export = 의 차이
+
+- `export default` , `commonjs` 의 `module.exports=` 와 호환되지 않는다.
+
+```ts
+// export default 를 하고서, commonjs 에서 require 로 가져오면 {default:{...}} 이렇게 감싸진다.
+const a = require('./dist/main.js').default;
+a.helloWorld()
+```
+
+- 그런데 아래처럼 `export = {}` 를 하면, commonjs 에서 require 로 가져올 때, 그냥 객체로 가져올 수 있다.
+
+```ts
+function helloWorld() {
+  console.log('Hello World');
+}
+
+function helloWorld2() {
+  console.log('Hello World 2');
+}
+
+export = {
+  helloWorld,
+  helloWorld2
+}
+
+
+// index.js
+const a = require('./dist/main.js')
+
+a.helloWorld()
+
+```
+
+> 즉, commonJS 에 호환되는 모듈을 작성하려면 export default 대신 export 를 사용해야한다.
+
+#### 외부 모듈 타입이 없다면 declare module 을 사용해 만들어낼 수 있다.
+
+```ts
+// custom.ts
+declare module 'kakao'{
+    export class Map {}
+}
+
+declare module '*.txt'{
+    const content:string;
+    export default content;
+}
+
+// main.ts
+
+import Kakao from 'kakao';
+import txt from 'hello.txt';
+
+const map = new Kakao.Map();
+
+```
+
+#### UMD 타입 
+
+```ts
+// custom.d.ts
+export function isPrime(x:number):boolean;
+export as namespace mathLib; // 이렇게 하면 window. 객체에 추가된다. node 라면 global 객체에 추가된다. 즉 전역으로 추가된다. 또한 import, require 도 가능하다
 ```
