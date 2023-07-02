@@ -6,6 +6,7 @@
     "module": "CommonJS",
     "outDir": "dist",
     "rootDir": "src",
-    "experimentalDecorators": true
+    "jsx": "react-jsx",
+    "allowSyntheticDefaultImports": true
   }
 }

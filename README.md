@@ -1526,12 +1526,12 @@ Array.prototype.toObservable = function () {
 };
 ```
 
-## Enum
+### Enum
 
 - 초기화 하지 않으면 0 부터 시작한다.
 - NaN, Infinity, -Infinity 는 enum 에서 사용할 수 없다.
 
-### 역 매핑도 가능하다
+#### 역 매핑도 가능하다
 
 ```ts
 enum UserResponse {
@@ -1549,5 +1549,41 @@ const res = UserResponse[a]; // "Yes"
 const enum UserResponse {
     No = 0,
     Yes = 1,
+}
+```
+
+### JSX
+
+- .tsx 확장자
+- jsx 옵션 활성화
+
+#### 괄호타입 x, as 연산자 사용
+
+- jsx 에서의 태그 문법과 겹치기 때문에, .tsx 파일에서는 꺽쇠 괄호 제네릭을 사용하지 않고, 그렇다면 extends 와 같은 키워드로 명시해줘야한다.
+
+```tsx
+const foo = <foo>bar; // error
+const foo = bar as foo; // ok
+
+const foo = <foo extends {}>bar; // ok
+```
+
+#### 커스텀 태그 타입 추가하는 방법
+
+```ts
+// custom.d.ts
+declare namespace JSX {
+    interface IntrinsicElements {
+        kong:any;
+    }
+}
+
+// App.tsx
+export default ()=>{
+  return (
+          <div>
+            <kong>HI</kong>
+          </div>
+  )
 }
 ```

@@ -17,13 +17,16 @@
   "dependencies": {
     "@types/lodash": "^4.14.195",
     "@types/react": "^18.2.14",
+    "@types/react-dom": "^18.2.6",
     "@types/three": "^0.152.1",
     "lodash": "^4.17.21",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "three": "^0.153.0"
   },
   "scripts": {
     "dev": "nodemon --exec ts-node src/main.ts",
-    "build":"rm -rf dist && tsc",
+    "build": "rm -rf dist && tsc",
     "start": "node dist/main.js"
   }
 }
